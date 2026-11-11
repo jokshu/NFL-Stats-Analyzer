@@ -69,7 +69,7 @@ def Fantasy_Points(Players, Amount):
         Interceptions_Thrown = Player["Passing Interceptions"]
         
         Yard_Points = (0.1 * (Total_Yards - Passing_Yards)) + (0.04 * Passing_Yards)
-        Touchdown_Points = (6 * (Total_Touchdowns - Passing_Touchdowns)) + (6 * Passing_Touchdowns)
+        Touchdown_Points = (6 * (Total_Touchdowns - Passing_Touchdowns)) + (4 * Passing_Touchdowns)
         Fumble_Points = (-2 * (Fumbles)) + (-2 * (Interceptions_Thrown))
         Reception_Points = (0.5 * (Receptions)) + (0.02 * Completions)
         Missed_Target_Points = (-0.1 * (Targets - Receptions)) + (-0.04 * (Attempts - Completions)) + (-0.04 * Sacks_Taken)
@@ -113,7 +113,7 @@ def Breakout_Index(Players, Amount):
         Interceptions_Thrown = Player["Passing Interceptions"]
         
         Yard_Points = (0.1 * (Total_Yards - Passing_Yards)) + (0.02 * Passing_Yards)
-        Touchdown_Points = (6 * (Total_Tds - Passing_Tds)) + (6 * Passing_Tds)
+        Touchdown_Points = (6 * (Total_Tds - Passing_Tds)) + (4 * Passing_Tds)
         Fumble_Points = (-2 * (Fumbs)) + (-2 * (Interceptions_Thrown))
         Reception_Points = (0.1 * (Rec)) + (0.02 * Comps) + (0.05 * Carrs)
         Missed_Target_Points = (-0.025 * (Targets - Rec)) + (-0.01 * (Atts - Comps)) + (-0.02 * Sacks_Taken)
@@ -140,10 +140,10 @@ def Relative_Prime_Index(Players, Amount): # Dominance Index
         Fumbs = Player["Fumbles"]
         
         Car = Player["Carries"]
-        Rush_Yards = max(Player["Rushing Yards"], 0)
-        
-        Rec_Yards = max(Player["Receiving Yards"], 0)
-        YAC = max(Player["Receiving Yards After Catch"], 0)
+        Rush_Yards = Player["Rushing Yards"]
+    
+        Rec_Yards = Player["Receiving Yards"]
+        YAC = Player["Receiving Yards After Catch"]
         Targets = Player["Targets"]
         Rec = Player["Receptions"]
         Air_Yards = YAC - Rec_Yards
@@ -155,20 +155,36 @@ def Relative_Prime_Index(Players, Amount): # Dominance Index
         Sacks_Taken = Player["Sacks Taken"]
         Interceptions_Thrown = Player["Passing Interceptions"]
         
-#        Yard_Points = (0.1 * (Total_Yards - Passing_Yards)) + (0.04 * Passing_Yards)
-        Touchdown_Points = 3 * ((Total_Tds - Passing_Tds)/(Car + Rec + 1)) + (3 * ((Passing_Tds)/(Comps + 1)))
-#        Fumble_Points = (-2 * (Fumbs)) + (-2 * (Interceptions_Thrown))
-        Reception_Points = (0.5 * Rec) + (0.02 * Comps)
+        Touchdown_Points = 0
+        Reception_Points = (0.2 * Rec) + (0.01 * Comps)
         Missed_Target_Points = (-0.02 * (Targets - Rec)) + (-0.01 * (Atts - Comps)) + (-0.02 * Sacks_Taken)
         
-        YPC = (Rush_Yards / (Car + 1))
-        YPR = (Air_Yards / (Rec + 1))
-        YACavg = (YAC / (Rec + 1))
-        YPTAvg = (Passing_Yards / (Comps + 1))
+        YPC = 0
+        YPR = 0
+        YACavg = 0
+        YPTAvg = 0
         
-        Yard_Points = 0.5 * YPC + 0.6 * YPR + 0.4 * YACavg + 0.4 * YPTAvg
-        Fumble_Points = (-1 * (Fumbs/(Car + Rec + 1))) + (-1 * (Interceptions_Thrown/(Comps + 1)))    
+        if Car > 0:
+            YPC = (Rush_Yards / Car)
+            
+        if Rec > 0:
+            YPR = (Air_Yards / Rec)
+            YACavg = (YAC / Rec)
+            
+        if Comps > 0:
+            Touchdown_Points += 3 * ((Passing_Tds)/(Comps))
+            YPTAvg = (Passing_Yards / Comps)
+            
+        Yard_Points = 1 * YPC + 0.75 * YPR + 0.5 * YACavg + 0.4 * YPTAvg
+        Fumble_Points = 0
         
+        if Car + Rec > 0:
+            Touchdown_Points += 3 * (Total_Tds - Passing_Tds)/(Car + Rec)
+            Fumble_Points += (-1 * (Fumbs/(Car + Rec)))
+         
+        if Atts > 0:
+            Fumble_Points += (-1 * (Interceptions_Thrown/(Atts)))
+                              
         Total_Points = round((Yard_Points + Touchdown_Points + Fumble_Points + Reception_Points + Missed_Target_Points) * (API/1000), 1)
         Database[ID] = Total_Points
 
