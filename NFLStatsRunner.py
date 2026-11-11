@@ -15,8 +15,8 @@ def print_indexes(index_boo, indexe):
             indie += indi_part[0]
         print_line += indie + ")\n"   
         
-        index_boo[indi.lower()] = indi.lower()
-        index_boo[indie.lower()] = indi.lower()
+        index_boo[indi.lower().replace(" ", "")] = indi.lower()
+        index_boo[indie.lower().replace(" ", "")] = indi.lower()
     
     print(print_line)
 
@@ -62,8 +62,10 @@ def get_index(index_boo, indexe):
     
     Index = None
     while Index == None:
+        OI = ""
         try:
-            Index = input("Enter desired index: ").strip().lower()
+            OI = input("Enter desired index: ")
+            Index = OI.strip().replace(" ", "").lower()
             
             if index_book[Index.lower()] == "fantasy points":
                 Index = "Fantasy Points"
@@ -75,7 +77,7 @@ def get_index(index_boo, indexe):
                 print("User Error: Unrecognized index.\nPlease retry.")    
         except Exception as e:
             Index = None
-            print("User Error: Unrecognized index {}.\nPlease retry.".format(e))
+            print("User Error: Unrecognized index {}.\nPlease retry.".format(OI))
             
     return Index
 
