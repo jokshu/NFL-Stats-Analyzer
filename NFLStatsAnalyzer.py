@@ -37,7 +37,7 @@ def Create_Database(Filter, Seasons):
         i += 1
     return Positions
 
-def Create_Leaderboard(Index, Database, Amount, PreSpace=5, ColumnSpacing=17):
+def Create_Leaderboard(Players, Index, Database, Amount, PreSpace=5, ColumnSpacing=17):
     i = 1
     SortedPoints = sorted(Database.items(), key=lambda kv: kv[1])
     PreSpace = 5
@@ -77,7 +77,7 @@ def Fantasy_Points(Players, Amount):
         Total_Points = round(Yard_Points + Touchdown_Points + Fumble_Points + Reception_Points + Missed_Target_Points, 2)
         Database[ID] = Total_Points
         
-    Create_Leaderboard("Fantasy Points", Database, Amount)
+    Create_Leaderboard(Players, "Fantasy Points", Database, Amount)
 
 def Breakout_Index(Players, Amount):
     Database = dict()
@@ -121,9 +121,9 @@ def Breakout_Index(Players, Amount):
         Total_Points = round((Yard_Points + Touchdown_Points + Fumble_Points + Reception_Points + Missed_Target_Points) * (API/10000), 1)
         Database[ID] = Total_Points
 
-    Create_Leaderboard("Breakout Score", Database, Amount)
+    Create_Leaderboard(Players, "Breakout Score", Database, Amount)
 
-def Relative_Prime_Index(Players, Amount):
+def Relative_Prime_Index(Players, Amount): # Dominance Index
     Database = dict()
     
     for key, Player in Players.items():
@@ -172,11 +172,9 @@ def Relative_Prime_Index(Players, Amount):
         Total_Points = round((Yard_Points + Touchdown_Points + Fumble_Points + Reception_Points + Missed_Target_Points) * (API/1000), 1)
         Database[ID] = Total_Points
 
-    Create_Leaderboard("RPI Score", Database, Amount)
-    
-Players = Create_Database({"Position": ["WR", "RB", "TE", "QB"]}, 2026)
+    Create_Leaderboard(Players, "RPI Score", Database, Amount)
 
 #Fantasy_Points(Players, 25)
 #Breakout_Index(Players, 25)
-Relative_Prime_Index(Players, 25)
+#Relative_Prime_Index(Players, 25)
     
